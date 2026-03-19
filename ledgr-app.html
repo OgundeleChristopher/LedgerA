@@ -1,0 +1,2414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LEDGR — Your Books. On Autopilot.</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #0A0A0F;
+  --paper: #F5F2EC;
+  --cream: #EDE9DF;
+  --accent: #1A6B4A;
+  --accent-bright: #22C47A;
+  --accent-gold: #C9A84C;
+  --accent-red: #C94C4C;
+  --muted: #6B6860;
+  --border: rgba(10,10,15,0.10);
+  --card-bg: rgba(255,255,255,0.8);
+  --surface: #161B22;
+  --surface2: #0D1117;
+  --mono: 'DM Mono', monospace;
+  --serif: 'DM Serif Display', serif;
+  --sans: 'Outfit', sans-serif;
+  --display: 'Bebas Neue', sans-serif;
+  --sidebar-w: 220px;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { font-size: 16px; }
+
+body {
+  background: var(--surface2);
+  color: white;
+  font-family: var(--sans);
+  font-weight: 400;
+  line-height: 1.6;
+  overflow: hidden;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── TOPBAR ─── */
+.topbar {
+  height: 54px;
+  background: var(--surface);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  padding: 0 1.5rem;
+  gap: 1.2rem;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
+}
+
+.logo {
+  font-family: var(--display);
+  font-size: 1.5rem;
+  letter-spacing: 0.1em;
+  color: white;
+  margin-right: 0.5rem;
+  flex-shrink: 0;
+}
+.logo span { color: var(--accent-bright); }
+
+.topbar-divider {
+  width: 1px;
+  height: 20px;
+  background: rgba(255,255,255,0.1);
+}
+
+.topbar-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  padding: 0.25rem 0.7rem;
+  border-radius: 3px;
+  border: 1px solid;
+}
+.badge-live { background: rgba(34,196,122,0.1); color: var(--accent-bright); border-color: rgba(34,196,122,0.25); }
+.badge-warn { background: rgba(201,168,76,0.1); color: var(--accent-gold); border-color: rgba(201,168,76,0.25); }
+.badge-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; animation: pulse 2s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+.topbar-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.topbar-period {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  color: rgba(255,255,255,0.3);
+}
+
+.avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-bright) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  font-weight: 500;
+  color: white;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* ─── LAYOUT ─── */
+.app-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ─── SIDEBAR ─── */
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--surface);
+  border-right: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  flex-direction: column;
+  padding: 1.2rem 0;
+  flex-shrink: 0;
+  overflow-y: auto;
+}
+
+.sidebar-section { margin-bottom: 0.3rem; }
+.sidebar-label {
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.2);
+  padding: 0.8rem 1.2rem 0.4rem;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.6rem 1.2rem;
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.45);
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+  border-left: 2px solid transparent;
+  user-select: none;
+}
+.nav-item:hover { color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.03); }
+.nav-item.active {
+  color: white;
+  background: rgba(34,196,122,0.08);
+  border-left-color: var(--accent-bright);
+}
+.nav-item.active .nav-icon { color: var(--accent-bright); }
+.nav-icon { font-size: 0.85rem; width: 16px; text-align: center; flex-shrink: 0; }
+
+.sidebar-bottom {
+  margin-top: auto;
+  padding: 1rem 1.2rem;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.plan-badge {
+  background: rgba(34,196,122,0.08);
+  border: 1px solid rgba(34,196,122,0.2);
+  border-radius: 6px;
+  padding: 0.8rem;
+}
+.plan-name { font-family: var(--mono); font-size: 0.65rem; color: var(--accent-bright); margin-bottom: 0.3rem; }
+.plan-desc { font-size: 0.72rem; color: rgba(255,255,255,0.4); line-height: 1.4; }
+
+/* ─── MAIN CONTENT ─── */
+.main {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: none;
+  flex-direction: column;
+}
+.main.active { display: flex; }
+
+/* ─── DASHBOARD ─── */
+.dash-header {
+  padding: 1.5rem 2rem 1rem;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.dash-greeting {
+  font-family: var(--display);
+  font-size: 1.8rem;
+  letter-spacing: 0.04em;
+  color: white;
+  line-height: 1;
+  margin-bottom: 0.3rem;
+}
+.dash-sub {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  color: rgba(255,255,255,0.3);
+}
+
+.dash-grid {
+  padding: 1.5rem 2rem;
+  display: grid;
+  gap: 1.2rem;
+}
+
+/* KPI Row */
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.kpi-card {
+  background: var(--surface);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 8px;
+  padding: 1.2rem;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.kpi-card:hover { border-color: rgba(255,255,255,0.12); }
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-bright));
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.kpi-card:hover::before { opacity: 1; }
+
+.kpi-label {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.3);
+  margin-bottom: 0.6rem;
+}
+.kpi-val {
+  font-family: var(--display);
+  font-size: 2rem;
+  letter-spacing: 0.02em;
+  color: white;
+  line-height: 1;
+  margin-bottom: 0.4rem;
+}
+.kpi-chg {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.kpi-chg.up { color: var(--accent-bright); }
+.kpi-chg.dn { color: var(--accent-red); }
+.kpi-chg.warn { color: var(--accent-gold); }
+
+/* Mid row */
+.mid-row {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 1rem;
+}
+
+.widget {
+  background: var(--surface);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 8px;
+  padding: 1.2rem;
+}
+.widget-title {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.3);
+  margin-bottom: 1rem;
+}
+
+/* Chart */
+.bar-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 100px;
+  margin-bottom: 0.8rem;
+}
+.bar-pair { display: flex; gap: 2px; flex: 1; align-items: flex-end; }
+.bar {
+  flex: 1;
+  border-radius: 2px 2px 0 0;
+  transition: opacity 0.2s;
+  cursor: pointer;
+  position: relative;
+}
+.bar:hover { opacity: 0.75; }
+.bar-rev { background: var(--accent-bright); }
+.bar-exp { background: var(--accent-red); opacity: 0.7; }
+
+.chart-labels {
+  display: flex;
+  gap: 4px;
+  font-family: var(--mono);
+  font-size: 0.55rem;
+  color: rgba(255,255,255,0.2);
+}
+.chart-labels span { flex: 1; text-align: center; }
+
+.chart-legend {
+  display: flex;
+  gap: 1.2rem;
+  margin-top: 0.6rem;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  color: rgba(255,255,255,0.4);
+}
+.legend-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+
+/* Donut */
+.donut-wrap {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+}
+.donut-svg { flex-shrink: 0; }
+.donut-legend { display: flex; flex-direction: column; gap: 0.5rem; }
+.donut-legend .legend-item { font-size: 0.7rem; }
+
+/* Alerts */
+.alert-card {
+  background: var(--surface);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 8px;
+  padding: 1.2rem;
+}
+.alert-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.alert-row:last-child { border-bottom: none; }
+.alert-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+.alert-body { flex: 1; }
+.alert-rule {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  color: white;
+  margin-bottom: 0.2rem;
+}
+.alert-desc { font-size: 0.75rem; color: rgba(255,255,255,0.45); line-height: 1.4; }
+.alert-action {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  color: var(--accent-bright);
+  border: 1px solid rgba(34,196,122,0.3);
+  background: rgba(34,196,122,0.08);
+  padding: 0.25rem 0.6rem;
+  border-radius: 3px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+.alert-action:hover { background: rgba(34,196,122,0.18); }
+
+/* Bottom row */
+.bottom-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+/* Txn list */
+.txn-list { display: flex; flex-direction: column; }
+.txn-row {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  font-size: 0.78rem;
+}
+.txn-row:last-child { border-bottom: none; }
+.txn-narration { font-family: var(--mono); font-size: 0.67rem; color: rgba(255,255,255,0.55); flex: 1; }
+.txn-cat {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 3px;
+}
+.cat-cloud { background: rgba(201,168,76,0.15); color: var(--accent-gold); }
+.cat-saas  { background: rgba(100,120,255,0.15); color: #8899FF; }
+.cat-pay   { background: rgba(34,196,122,0.15); color: var(--accent-bright); }
+.cat-rev   { background: rgba(34,196,122,0.1); color: #5DD39E; }
+.cat-util  { background: rgba(160,160,200,0.15); color: #AAAADD; }
+.cat-ads   { background: rgba(201,76,76,0.12); color: #FF8888; }
+.txn-amount { font-family: var(--mono); font-size: 0.72rem; color: white; text-align: right; min-width: 70px; }
+.txn-amount.neg { color: var(--accent-red); }
+.txn-amount.pos { color: var(--accent-bright); }
+
+/* ─── TRANSACTIONS PAGE ─── */
+.page-header {
+  padding: 1.5rem 2rem 1rem;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.page-title {
+  font-family: var(--display);
+  font-size: 1.8rem;
+  letter-spacing: 0.04em;
+}
+.page-actions { margin-left: auto; display: flex; gap: 0.6rem; }
+.btn {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  padding: 0.4rem 0.9rem;
+  border-radius: 4px;
+  cursor: pointer;
+  border: 1px solid;
+  transition: all 0.15s;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.btn-outline { background: transparent; border-color: rgba(255,255,255,0.15); color: rgba(255,255,255,0.6); }
+.btn-outline:hover { border-color: rgba(255,255,255,0.3); color: white; }
+.btn-primary { background: var(--accent); border-color: var(--accent); color: white; }
+.btn-primary:hover { background: var(--accent-bright); border-color: var(--accent-bright); }
+
+.filter-bar {
+  padding: 1rem 2rem;
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.search-input {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 5px;
+  padding: 0.45rem 0.9rem;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: white;
+  outline: none;
+  flex: 1;
+  max-width: 280px;
+  transition: border-color 0.15s;
+}
+.search-input::placeholder { color: rgba(255,255,255,0.25); }
+.search-input:focus { border-color: rgba(34,196,122,0.4); }
+
+.filter-chip {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.45);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.filter-chip:hover { border-color: rgba(255,255,255,0.25); color: rgba(255,255,255,0.8); }
+.filter-chip.active { background: rgba(34,196,122,0.12); border-color: rgba(34,196,122,0.35); color: var(--accent-bright); }
+
+.txn-table-wrap { padding: 1.5rem 2rem; flex: 1; overflow-y: auto; }
+.txn-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.txn-table th {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.25);
+  padding: 0 0.8rem 0.8rem;
+  text-align: left;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.txn-table td {
+  padding: 0.7rem 0.8rem;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  font-size: 0.8rem;
+}
+.txn-table tr:hover td { background: rgba(255,255,255,0.02); }
+.txn-table tr:last-child td { border-bottom: none; }
+.td-narr { font-family: var(--mono); font-size: 0.7rem; color: rgba(255,255,255,0.65); }
+.td-date { font-family: var(--mono); font-size: 0.67rem; color: rgba(255,255,255,0.3); }
+.td-amount { font-family: var(--mono); font-weight: 500; }
+.td-amount.pos-val { color: var(--accent-bright); }
+.td-amount.neg-val { color: rgba(255,255,255,0.75); }
+.confidence-bar-wrap { display: flex; align-items: center; gap: 0.5rem; }
+.confidence-bar {
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255,255,255,0.08);
+  flex: 1;
+  max-width: 60px;
+  overflow: hidden;
+}
+.confidence-fill { height: 100%; border-radius: 2px; background: var(--accent-bright); }
+.confidence-num { font-family: var(--mono); font-size: 0.6rem; color: rgba(255,255,255,0.3); }
+.low-confidence .confidence-fill { background: var(--accent-gold); }
+
+/* ─── P&L PAGE ─── */
+.pl-content { padding: 1.5rem 2rem; }
+.pl-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  margin-bottom: 1.5rem;
+}
+.pl-tab {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.6rem 1.2rem;
+  cursor: pointer;
+  color: rgba(255,255,255,0.3);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: all 0.15s;
+}
+.pl-tab.active { color: var(--accent-bright); border-bottom-color: var(--accent-bright); }
+
+.pl-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+.pl-table th {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: rgba(255,255,255,0.25);
+  padding: 0 1rem 0.8rem 0;
+  text-align: right;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.pl-table th:first-child { text-align: left; }
+.pl-table td {
+  padding: 0.55rem 1rem 0.55rem 0;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  text-align: right;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.65);
+}
+.pl-table td:first-child { text-align: left; color: rgba(255,255,255,0.8); padding-left: 0; }
+.pl-table .section-row td {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.2);
+  padding-top: 1.2rem;
+  padding-bottom: 0.4rem;
+  border-bottom: none;
+}
+.pl-table .subtotal-row td {
+  font-weight: 600;
+  color: white;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  padding-top: 0.6rem;
+  padding-bottom: 0.6rem;
+}
+.pl-table .total-row td {
+  font-family: var(--display);
+  font-size: 1rem;
+  letter-spacing: 0.04em;
+  color: white;
+  border-top: 2px solid rgba(255,255,255,0.15);
+  padding-top: 0.8rem;
+}
+.val-pos { color: var(--accent-bright) !important; }
+.val-neg { color: var(--accent-red) !important; }
+
+/* ─── AI CHAT PAGE ─── */
+.chat-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.chat-header {
+  padding: 1.5rem 2rem 1rem;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.chat-title { font-family: var(--display); font-size: 1.8rem; letter-spacing: 0.04em; }
+.chat-sub { font-family: var(--mono); font-size: 0.65rem; color: rgba(255,255,255,0.3); margin-top: 0.2rem; }
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.msg { display: flex; gap: 0.8rem; max-width: 680px; }
+.msg.user { flex-direction: row-reverse; margin-left: auto; }
+.msg-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.msg-avatar.ai { background: linear-gradient(135deg, var(--accent) 0%, var(--accent-bright) 100%); color: white; }
+.msg-avatar.user-av { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.6); }
+.msg-bubble {
+  background: var(--surface);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 8px;
+  padding: 0.9rem 1.1rem;
+  font-size: 0.84rem;
+  line-height: 1.65;
+  color: rgba(255,255,255,0.85);
+}
+.msg.user .msg-bubble {
+  background: rgba(34,196,122,0.1);
+  border-color: rgba(34,196,122,0.2);
+  color: rgba(255,255,255,0.9);
+}
+.msg-bubble strong { color: white; }
+.msg-bubble .inline-num {
+  font-family: var(--mono);
+  color: var(--accent-bright);
+  font-weight: 500;
+}
+.msg-label {
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  color: rgba(255,255,255,0.2);
+  margin-bottom: 0.3rem;
+}
+.ai-insight {
+  margin-top: 0.7rem;
+  background: rgba(34,196,122,0.06);
+  border: 1px solid rgba(34,196,122,0.15);
+  border-radius: 5px;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.65);
+  line-height: 1.5;
+}
+.ai-insight::before { content: '💡 '; }
+
+.quick-prompts {
+  padding: 0 2rem 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.quick-prompt {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  padding: 0.35rem 0.8rem;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.5);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.quick-prompt:hover { border-color: rgba(34,196,122,0.35); color: var(--accent-bright); background: rgba(34,196,122,0.06); }
+
+.chat-input-bar {
+  padding: 1rem 2rem 1.5rem;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  display: flex;
+  gap: 0.7rem;
+  align-items: flex-end;
+}
+.chat-input {
+  flex: 1;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-family: var(--sans);
+  font-size: 0.85rem;
+  color: white;
+  outline: none;
+  resize: none;
+  min-height: 44px;
+  max-height: 120px;
+  transition: border-color 0.15s;
+  line-height: 1.5;
+}
+.chat-input::placeholder { color: rgba(255,255,255,0.2); }
+.chat-input:focus { border-color: rgba(34,196,122,0.4); }
+.send-btn {
+  background: var(--accent);
+  border: none;
+  border-radius: 7px;
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: white;
+  font-size: 1.1rem;
+  transition: background 0.15s;
+}
+.send-btn:hover { background: var(--accent-bright); }
+
+/* ─── CASH FLOW PAGE ─── */
+.cf-content { padding: 1.5rem 2rem; }
+.cf-summary-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.cf-card {
+  background: var(--surface);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 8px;
+  padding: 1.2rem;
+}
+.cf-label { font-family: var(--mono); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.14em; color: rgba(255,255,255,0.3); margin-bottom: 0.5rem; }
+.cf-val { font-family: var(--display); font-size: 1.8rem; letter-spacing: 0.02em; }
+.cf-val.pos { color: var(--accent-bright); }
+.cf-val.neg { color: var(--accent-red); }
+.cf-sub { font-family: var(--mono); font-size: 0.62rem; color: rgba(255,255,255,0.3); margin-top: 0.3rem; }
+
+.cf-chart-wrap {
+  background: var(--surface);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 8px;
+  padding: 1.4rem;
+  margin-bottom: 1.2rem;
+}
+.cf-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  height: 140px;
+  margin: 1rem 0 0.5rem;
+}
+.cf-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.cf-bar {
+  width: 100%;
+  border-radius: 3px 3px 0 0;
+  transition: opacity 0.2s;
+  cursor: pointer;
+}
+.cf-bar:hover { opacity: 0.7; }
+.cf-bar-label {
+  font-family: var(--mono);
+  font-size: 0.55rem;
+  color: rgba(255,255,255,0.2);
+  text-align: center;
+}
+.cf-forecast-tag {
+  font-family: var(--mono);
+  font-size: 0.55rem;
+  color: rgba(255,255,255,0.15);
+  text-align: center;
+  font-style: italic;
+}
+
+.runway-card {
+  background: linear-gradient(135deg, rgba(26,107,74,0.15) 0%, rgba(34,196,122,0.05) 100%);
+  border: 1px solid rgba(34,196,122,0.2);
+  border-radius: 8px;
+  padding: 1.4rem;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+.runway-num { font-family: var(--display); font-size: 3rem; color: var(--accent-bright); line-height: 1; }
+.runway-label { font-family: var(--mono); font-size: 0.65rem; color: rgba(255,255,255,0.4); margin-top: 0.3rem; }
+.runway-desc { font-size: 0.82rem; color: rgba(255,255,255,0.6); line-height: 1.5; flex: 1; }
+
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+/* ─── ANIMATIONS ─── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.main.active > * { animation: fadeUp 0.3s ease forwards; }
+.kpi-card { animation-delay: calc(var(--i, 0) * 50ms); }
+
+/* ─── TYPING INDICATOR ─── */
+.typing-indicator { display: flex; gap: 4px; align-items: center; padding: 4px 0; }
+.typing-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.3); animation: typing 1.2s ease-in-out infinite; }
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typing { 0%,80%,100%{transform:scale(0.8);opacity:0.4} 40%{transform:scale(1.1);opacity:1} }
+
+
+/* ─── LOGIN SCREEN ─── */
+#loginScreen {
+  position:fixed;inset:0;z-index:9999;background:var(--surface2);
+  display:flex;align-items:center;justify-content:center;
+}
+#loginScreen.hidden{display:none;}
+.login-bg{position:absolute;inset:0;overflow:hidden;pointer-events:none;}
+.login-bg-grid{
+  position:absolute;inset:0;
+  background-image:linear-gradient(rgba(34,196,122,0.04) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(34,196,122,0.04) 1px,transparent 1px);
+  background-size:48px 48px;
+}
+.login-bg-glow{
+  position:absolute;width:700px;height:700px;border-radius:50%;
+  background:radial-gradient(circle,rgba(34,196,122,0.08) 0%,transparent 70%);
+  top:50%;left:50%;transform:translate(-50%,-50%);
+}
+.login-card{
+  position:relative;z-index:1;background:var(--surface);
+  border:1px solid rgba(255,255,255,0.09);border-radius:16px;
+  padding:3rem 2.5rem 2.5rem;width:420px;max-width:92vw;
+  box-shadow:0 32px 80px rgba(0,0,0,0.6);
+}
+.login-logo{font-family:var(--display);font-size:2.4rem;letter-spacing:0.1em;color:white;line-height:1;}
+.login-logo span{color:var(--accent-bright);}
+.login-tagline{font-family:var(--mono);font-size:0.6rem;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.25);margin:0.3rem 0 2.4rem;}
+.login-label{font-family:var(--mono);font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:0.45rem;}
+.login-input{
+  width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);
+  border-radius:8px;padding:0.8rem 1rem;color:white;font-family:var(--sans);
+  font-size:0.9rem;outline:none;margin-bottom:1.25rem;display:block;
+  transition:border-color 0.15s;box-sizing:border-box;
+}
+.login-input:focus{border-color:rgba(34,196,122,0.5);background:rgba(34,196,122,0.03);}
+.login-input::placeholder{color:rgba(255,255,255,0.2);}
+.login-btn{
+  width:100%;background:var(--accent);border:none;border-radius:8px;
+  padding:0.9rem;color:white;font-family:var(--sans);font-size:0.92rem;
+  font-weight:600;cursor:pointer;transition:background 0.15s;
+  letter-spacing:0.02em;margin-top:0.2rem;
+}
+.login-btn:hover{background:var(--accent-bright);}
+.login-btn:disabled{opacity:0.5;cursor:not-allowed;}
+.login-error{
+  display:none;background:rgba(201,76,76,0.1);border:1px solid rgba(201,76,76,0.3);
+  color:#f08080;font-family:var(--mono);font-size:0.72rem;
+  padding:0.65rem 0.9rem;border-radius:6px;margin-bottom:1.2rem;line-height:1.5;
+}
+.login-hint{
+  margin-top:1.5rem;padding-top:1.4rem;border-top:1px solid rgba(255,255,255,0.06);
+  display:flex;align-items:center;gap:0.8rem;
+}
+.login-hint-badge{
+  font-family:var(--mono);font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;
+  color:var(--accent-bright);background:rgba(34,196,122,0.1);border:1px solid rgba(34,196,122,0.2);
+  border-radius:3px;padding:0.2rem 0.5rem;flex-shrink:0;
+}
+.login-hint-text{font-family:var(--mono);font-size:0.62rem;color:rgba(255,255,255,0.22);line-height:1.6;}
+.login-hint-text strong{color:rgba(255,255,255,0.5);font-weight:500;}
+
+/* ─── SETTINGS & BANKS ─── */
+.page-header { padding:1.5rem 2rem 1rem; border-bottom:1px solid rgba(255,255,255,0.05); }
+.page-title { font-family:var(--display); font-size:1.8rem; letter-spacing:0.04em; color:white; line-height:1; }
+.page-sub { font-family:var(--mono); font-size:0.65rem; color:rgba(255,255,255,0.3); margin-top:0.3rem; }
+.page-content { padding:1.5rem 2rem; overflow-y:auto; flex:1; }
+
+/* Settings tabs */
+.settings-tabs { display:flex; gap:0.5rem; margin-bottom:1.5rem; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:0; }
+.s-tab {
+  font-family:var(--mono); font-size:0.7rem; letter-spacing:0.08em; text-transform:uppercase;
+  color:rgba(255,255,255,0.35); padding:0.6rem 1rem 0.75rem; cursor:pointer;
+  border-bottom:2px solid transparent; transition:all 0.15s; margin-bottom:-1px;
+}
+.s-tab:hover { color:rgba(255,255,255,0.7); }
+.s-tab.active { color:var(--accent-bright); border-bottom-color:var(--accent-bright); }
+
+.settings-panel { display:none; }
+.settings-panel.active { display:block; }
+
+/* Settings sections */
+.s-section { background:var(--surface); border:1px solid rgba(255,255,255,0.06); border-radius:10px; padding:1.5rem; margin-bottom:1.2rem; }
+.s-section-title { font-family:var(--mono); font-size:0.65rem; letter-spacing:0.14em; text-transform:uppercase; color:rgba(255,255,255,0.3); margin-bottom:1.2rem; }
+.s-row { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem; }
+.s-row.full { grid-template-columns:1fr; }
+.s-field label { font-family:var(--mono); font-size:0.6rem; letter-spacing:0.1em; text-transform:uppercase; color:rgba(255,255,255,0.35); display:block; margin-bottom:0.4rem; }
+.s-input {
+  width:100%; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.09);
+  border-radius:7px; padding:0.7rem 0.9rem; color:white; font-family:var(--sans);
+  font-size:0.85rem; outline:none; transition:border-color 0.15s; box-sizing:border-box;
+}
+.s-input:focus { border-color:rgba(34,196,122,0.4); background:rgba(34,196,122,0.03); }
+.s-input::placeholder { color:rgba(255,255,255,0.18); }
+.s-select {
+  width:100%; background:#1e2530; border:1px solid rgba(255,255,255,0.09);
+  border-radius:7px; padding:0.7rem 0.9rem; color:white; font-family:var(--sans);
+  font-size:0.85rem; outline:none; cursor:pointer; box-sizing:border-box;
+}
+.s-btn {
+  background:var(--accent); border:none; border-radius:7px; padding:0.65rem 1.4rem;
+  color:white; font-family:var(--sans); font-size:0.82rem; font-weight:600;
+  cursor:pointer; transition:background 0.15s;
+}
+.s-btn:hover { background:var(--accent-bright); }
+.s-btn.ghost {
+  background:transparent; border:1px solid rgba(255,255,255,0.12); color:rgba(255,255,255,0.6);
+}
+.s-btn.ghost:hover { border-color:rgba(255,255,255,0.3); color:white; background:rgba(255,255,255,0.05); }
+.s-btn.danger { background:rgba(201,76,76,0.15); border:1px solid rgba(201,76,76,0.3); color:#f08080; }
+.s-btn.danger:hover { background:rgba(201,76,76,0.25); }
+.s-btn-row { display:flex; gap:0.7rem; margin-top:1rem; }
+
+/* Toggle switch */
+.s-toggle-row { display:flex; align-items:center; justify-content:space-between; padding:0.8rem 0; border-bottom:1px solid rgba(255,255,255,0.04); }
+.s-toggle-row:last-child { border-bottom:none; }
+.s-toggle-info { flex:1; }
+.s-toggle-label { font-size:0.85rem; color:rgba(255,255,255,0.8); margin-bottom:0.15rem; }
+.s-toggle-desc { font-family:var(--mono); font-size:0.62rem; color:rgba(255,255,255,0.3); }
+.toggle { position:relative; width:40px; height:22px; flex-shrink:0; cursor:pointer; }
+.toggle input { opacity:0; width:0; height:0; }
+.toggle-track {
+  position:absolute; inset:0; background:rgba(255,255,255,0.1); border-radius:11px;
+  transition:background 0.2s;
+}
+.toggle input:checked + .toggle-track { background:var(--accent); }
+.toggle-thumb {
+  position:absolute; top:3px; left:3px; width:16px; height:16px;
+  background:white; border-radius:50%; transition:transform 0.2s; pointer-events:none;
+}
+.toggle input:checked ~ .toggle-thumb { transform:translateX(18px); }
+
+/* Toast notification */
+.toast {
+  position:fixed; bottom:2rem; right:2rem; z-index:9998;
+  background:var(--surface); border:1px solid rgba(34,196,122,0.3);
+  border-radius:8px; padding:0.9rem 1.4rem;
+  font-family:var(--mono); font-size:0.72rem; color:var(--accent-bright);
+  box-shadow:0 8px 32px rgba(0,0,0,0.4);
+  transform:translateY(20px); opacity:0; transition:all 0.25s;
+  pointer-events:none;
+}
+.toast.show { transform:translateY(0); opacity:1; }
+
+/* ─── BANK ACCOUNTS PAGE ─── */
+.bank-toolbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:1.2rem; }
+.bank-toolbar-title { font-family:var(--mono); font-size:0.65rem; letter-spacing:0.14em; text-transform:uppercase; color:rgba(255,255,255,0.3); }
+.add-bank-btn {
+  display:flex; align-items:center; gap:0.5rem;
+  background:var(--accent); border:none; border-radius:7px; padding:0.55rem 1.1rem;
+  color:white; font-family:var(--sans); font-size:0.8rem; font-weight:600;
+  cursor:pointer; transition:background 0.15s;
+}
+.add-bank-btn:hover { background:var(--accent-bright); }
+
+.bank-card {
+  background:var(--surface); border:1px solid rgba(255,255,255,0.06);
+  border-radius:10px; padding:1.3rem 1.5rem; margin-bottom:0.9rem;
+  display:flex; align-items:center; gap:1.2rem; transition:border-color 0.15s;
+}
+.bank-card:hover { border-color:rgba(255,255,255,0.12); }
+.bank-icon {
+  width:44px; height:44px; border-radius:10px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--mono); font-size:0.75rem; font-weight:600; color:white;
+}
+.bank-info { flex:1; }
+.bank-name { font-size:0.9rem; font-weight:600; color:white; margin-bottom:0.2rem; }
+.bank-meta { font-family:var(--mono); font-size:0.62rem; color:rgba(255,255,255,0.3); }
+.bank-balance-col { text-align:right; }
+.bank-balance { font-family:var(--display); font-size:1.4rem; letter-spacing:0.02em; color:white; }
+.bank-balance-label { font-family:var(--mono); font-size:0.58rem; color:rgba(255,255,255,0.25); text-transform:uppercase; letter-spacing:0.1em; }
+.bank-actions { display:flex; gap:0.5rem; }
+.bank-action-btn {
+  background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08);
+  border-radius:6px; padding:0.4rem 0.8rem; color:rgba(255,255,255,0.5);
+  font-family:var(--mono); font-size:0.6rem; cursor:pointer; transition:all 0.15s;
+  letter-spacing:0.06em; text-transform:uppercase;
+}
+.bank-action-btn:hover { background:rgba(255,255,255,0.1); color:white; border-color:rgba(255,255,255,0.2); }
+.bank-action-btn.sync { color:var(--accent-bright); border-color:rgba(34,196,122,0.2); background:rgba(34,196,122,0.06); }
+.bank-action-btn.sync:hover { background:rgba(34,196,122,0.12); }
+
+.bank-total-bar {
+  background:linear-gradient(135deg,rgba(26,107,74,0.15),rgba(34,196,122,0.05));
+  border:1px solid rgba(34,196,122,0.2); border-radius:10px; padding:1.2rem 1.5rem;
+  display:flex; align-items:center; justify-content:space-between; margin-bottom:1.5rem;
+}
+.bank-total-label { font-family:var(--mono); font-size:0.6rem; letter-spacing:0.12em; text-transform:uppercase; color:rgba(255,255,255,0.3); margin-bottom:0.3rem; }
+.bank-total-val { font-family:var(--display); font-size:2rem; color:var(--accent-bright); letter-spacing:0.03em; }
+.bank-total-sub { font-family:var(--mono); font-size:0.6rem; color:rgba(255,255,255,0.2); margin-top:0.2rem; }
+
+/* Modal overlay */
+.modal-overlay {
+  position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:8000;
+  display:flex; align-items:center; justify-content:center;
+  opacity:0; pointer-events:none; transition:opacity 0.2s;
+}
+.modal-overlay.open { opacity:1; pointer-events:all; }
+.modal-box {
+  background:var(--surface); border:1px solid rgba(255,255,255,0.1);
+  border-radius:12px; padding:2rem; width:460px; max-width:92vw;
+  transform:translateY(16px); transition:transform 0.2s;
+}
+.modal-overlay.open .modal-box { transform:translateY(0); }
+.modal-title { font-family:var(--display); font-size:1.4rem; letter-spacing:0.05em; color:white; margin-bottom:0.3rem; }
+.modal-sub { font-family:var(--mono); font-size:0.62rem; color:rgba(255,255,255,0.3); margin-bottom:1.5rem; }
+.modal-footer { display:flex; gap:0.7rem; margin-top:1.5rem; justify-content:flex-end; }
+
+</style>
+</head>
+<body>
+
+
+<div id="loginScreen">
+  <div class="login-bg">
+    <div class="login-bg-grid"></div>
+    <div class="login-bg-glow"></div>
+  </div>
+  <div class="login-card">
+    <div class="login-logo">LEDG<span>R</span></div>
+    <div class="login-tagline">Your Books. On Autopilot.</div>
+    <div id="loginError" class="login-error"></div>
+    <div class="login-label">Email Address</div>
+    <input id="loginEmail" class="login-input" type="email" placeholder="you@company.com" />
+    <div class="login-label">Password</div>
+    <input id="loginPassword" class="login-input" type="password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" />
+    <button class="login-btn" id="loginBtn">Sign In</button>
+    <div class="login-hint">
+      <span class="login-hint-badge">Demo</span>
+      <span class="login-hint-text">
+        Email: <strong>owner@techpulse.ng</strong><br>
+        Password: <strong>password123</strong>
+      </span>
+    </div>
+  </div>
+</div>
+
+
+<!-- APP SHELL -->
+<div id="appShell" style="display:none;flex-direction:column;height:100vh;overflow:hidden;">
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="logo">LEDG<span>R</span></div>
+  <div class="topbar-divider"></div>
+  <div class="topbar-badge badge-live"><span class="badge-dot"></span> Live Sync</div>
+  <div class="topbar-badge badge-warn">⚠ 2 Alerts</div>
+  <div class="topbar-right">
+    <div class="topbar-period">March 2026 · GTBank ••4821 · Zenith ••7703</div>
+    <div class="avatar">OA</div>
+  </div>
+</div>
+
+<!-- APP BODY -->
+<div class="app-body">
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Navigation</div>
+      <div class="nav-item active" data-page="dashboard">
+        <span class="nav-icon">◼</span> Overview
+      </div>
+      <div class="nav-item" data-page="transactions">
+        <span class="nav-icon">↕</span> Transactions
+      </div>
+      <div class="nav-item" data-page="pl">
+        <span class="nav-icon">◎</span> P&amp;L Report
+      </div>
+      <div class="nav-item" data-page="cashflow">
+        <span class="nav-icon">⌒</span> Cash Flow
+      </div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Tools</div>
+      <div class="nav-item" data-page="chat">
+        <span class="nav-icon">✦</span> AI Accountant
+      </div>
+      <div class="nav-item" data-page="transactions">
+        <span class="nav-icon">⊞</span> Spreadsheet
+      </div>
+      <div class="nav-item" data-page="dashboard">
+        <span class="nav-icon">⚑</span> Audit Log
+      </div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Account</div>
+      <div class="nav-item" data-page="banks">
+        <span class="nav-icon">⊕</span> Bank Accounts
+      </div>
+      <div class="nav-item" data-page="settings">
+        <span class="nav-icon">◈</span> Settings
+      </div>
+    </div>
+    <div class="sidebar-bottom">
+      <div class="plan-badge">
+        <div class="plan-name">Growth Plan · ₦15,000/mo</div>
+        <div class="plan-desc">3 accounts · Unlimited txns · AI Chat</div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- DASHBOARD -->
+  <!-- ══════════════════════════════════════ -->
+  <div class="main active" id="page-dashboard">
+    <div class="dash-header">
+      <div class="dash-greeting">Good morning, Christopher.</div>
+      <div class="dash-sub">March 2026 · 18 days in · Last sync 2 minutes ago</div>
+    </div>
+    <div class="dash-grid">
+
+      <!-- KPIs -->
+      <div class="kpi-row">
+        <div class="kpi-card" style="--i:0">
+          <div class="kpi-label">Revenue (MTD)</div>
+          <div class="kpi-val">₦4.82M</div>
+          <div class="kpi-chg up">↑ 12.4% vs Feb</div>
+        </div>
+        <div class="kpi-card" style="--i:1">
+          <div class="kpi-label">Total Expenses</div>
+          <div class="kpi-val">₦3.11M</div>
+          <div class="kpi-chg dn">↑ 8.1% vs Feb</div>
+        </div>
+        <div class="kpi-card" style="--i:2">
+          <div class="kpi-label">Net Profit</div>
+          <div class="kpi-val">₦1.71M</div>
+          <div class="kpi-chg up">↑ 19.6% vs Feb</div>
+        </div>
+        <div class="kpi-card" style="--i:3">
+          <div class="kpi-label">Burn Rate</div>
+          <div class="kpi-val">₦104K</div>
+          <div class="kpi-chg warn">per day avg</div>
+        </div>
+      </div>
+
+      <!-- Mid row -->
+      <div class="mid-row">
+        <!-- Revenue vs Expenses Chart -->
+        <div class="widget">
+          <div class="widget-title">Revenue vs Expenses — 12 Months</div>
+          <div class="bar-chart" id="revChart">
+            <!-- JS fills this -->
+          </div>
+          <div class="chart-labels" id="chartLabels"></div>
+          <div class="chart-legend">
+            <div class="legend-item"><div class="legend-dot" style="background:var(--accent-bright)"></div>Revenue</div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--accent-red);opacity:0.7"></div>Expenses</div>
+          </div>
+        </div>
+
+        <!-- Donut -->
+        <div class="widget">
+          <div class="widget-title">Expense Breakdown — MTD</div>
+          <div class="donut-wrap">
+            <svg class="donut-svg" width="90" height="90" viewBox="0 0 90 90">
+              <circle cx="45" cy="45" r="35" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="16"/>
+              <!-- Payroll 38% -->
+              <circle cx="45" cy="45" r="35" fill="none" stroke="#22C47A" stroke-width="16"
+                stroke-dasharray="83.2 136.8" stroke-dashoffset="0" transform="rotate(-90 45 45)"/>
+              <!-- SaaS 24% -->
+              <circle cx="45" cy="45" r="35" fill="none" stroke="#8899FF" stroke-width="16"
+                stroke-dasharray="52.7 167.3" stroke-dashoffset="-83.2" transform="rotate(-90 45 45)"/>
+              <!-- Marketing 16% -->
+              <circle cx="45" cy="45" r="35" fill="none" stroke="#C9A84C" stroke-width="16"
+                stroke-dasharray="35.2 184.8" stroke-dashoffset="-135.9" transform="rotate(-90 45 45)"/>
+              <!-- Infra 12% -->
+              <circle cx="45" cy="45" r="35" fill="none" stroke="#C94C4C" stroke-width="16"
+                stroke-dasharray="26.4 193.6" stroke-dashoffset="-171.1" transform="rotate(-90 45 45)"/>
+              <!-- Other 10% -->
+              <circle cx="45" cy="45" r="35" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="16"
+                stroke-dasharray="22" stroke-dashoffset="-197.5" transform="rotate(-90 45 45)"/>
+            </svg>
+            <div class="donut-legend">
+              <div class="legend-item"><div class="legend-dot" style="background:#22C47A"></div>Payroll 38%</div>
+              <div class="legend-item"><div class="legend-dot" style="background:#8899FF"></div>SaaS/Tools 24%</div>
+              <div class="legend-item"><div class="legend-dot" style="background:#C9A84C"></div>Marketing 16%</div>
+              <div class="legend-item"><div class="legend-dot" style="background:#C94C4C"></div>Infra 12%</div>
+              <div class="legend-item"><div class="legend-dot" style="background:rgba(255,255,255,0.15)"></div>Other 10%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom row -->
+      <div class="bottom-row">
+        <!-- Alerts -->
+        <div class="alert-card">
+          <div class="widget-title">⚠ Audit Alerts — Requires Attention</div>
+          <div class="alert-row">
+            <div class="alert-indicator" style="background:#C94C4C"></div>
+            <div class="alert-body">
+              <div class="alert-rule">AMOUNT_SPIKE — SLACK_MONTHLY_SVC</div>
+              <div class="alert-desc">SaaS Tools charge up 142% vs 3-month avg. Expected ₦38K, received ₦92K on 14 Mar.</div>
+            </div>
+            <div class="alert-action">Review</div>
+          </div>
+          <div class="alert-row">
+            <div class="alert-indicator" style="background:#C9A84C"></div>
+            <div class="alert-body">
+              <div class="alert-rule">UNMATCHED_REVENUE — +₦890K inbound</div>
+              <div class="alert-desc">Large inbound from PSTK/MONNIFY_SETTLE has no matching invoice reference. Confirm source.</div>
+            </div>
+            <div class="alert-action">Confirm</div>
+          </div>
+          <div class="alert-row">
+            <div class="alert-indicator" style="background:#22C47A"></div>
+            <div class="alert-body">
+              <div class="alert-rule">MONTH_END_RECONCILE — Feb 2026 ✓</div>
+              <div class="alert-desc">February reconciliation complete. Bank balance matches Ledgr total. Variance: ₦0.</div>
+            </div>
+            <div class="alert-action">View Report</div>
+          </div>
+        </div>
+
+        <!-- Recent Transactions -->
+        <div class="widget">
+          <div class="widget-title">Recent Transactions</div>
+          <div class="txn-list">
+            <div class="txn-row">
+              <div class="txn-narration">AWS_RECUR_7294</div>
+              <div class="txn-cat cat-cloud">Cloud Infra</div>
+              <div class="txn-amount neg">−₦124K</div>
+            </div>
+            <div class="txn-row">
+              <div class="txn-narration">PSTK/MONNIFY_SETTLE</div>
+              <div class="txn-cat cat-rev">Revenue</div>
+              <div class="txn-amount pos">+₦890K</div>
+            </div>
+            <div class="txn-row">
+              <div class="txn-narration">SLACK_MONTHLY_SVC</div>
+              <div class="txn-cat cat-saas">SaaS Tools</div>
+              <div class="txn-amount neg">−₦92K</div>
+            </div>
+            <div class="txn-row">
+              <div class="txn-narration">ZOHOPAYROLL_MAR</div>
+              <div class="txn-cat cat-pay">Payroll</div>
+              <div class="txn-amount neg">−₦1.20M</div>
+            </div>
+            <div class="txn-row">
+              <div class="txn-narration">GOOGADS_CONVERT_MKT9</div>
+              <div class="txn-cat cat-ads">Digital Ads</div>
+              <div class="txn-amount neg">−₦155K</div>
+            </div>
+            <div class="txn-row">
+              <div class="txn-narration">NEPA/IKEDC_COMMERCIAL</div>
+              <div class="txn-cat cat-util">Utilities</div>
+              <div class="txn-amount neg">−₦28K</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- TRANSACTIONS -->
+  <!-- ══════════════════════════════════════ -->
+  <div class="main" id="page-transactions">
+    <div class="page-header">
+      <div class="page-title">Transactions</div>
+      <div class="topbar-badge badge-live" style="font-size:0.6rem"><span class="badge-dot"></span> Real-time</div>
+      <div class="page-actions">
+        <div class="btn btn-outline">Export CSV</div>
+        <div class="btn btn-primary">+ Add Manual</div>
+      </div>
+    </div>
+    <div class="filter-bar">
+      <input class="search-input" type="text" placeholder="Search narrations…" id="txnSearch">
+      <div class="filter-chip active" data-filter="all">All</div>
+      <div class="filter-chip" data-filter="revenue">Revenue</div>
+      <div class="filter-chip" data-filter="payroll">Payroll</div>
+      <div class="filter-chip" data-filter="saas">SaaS Tools</div>
+      <div class="filter-chip" data-filter="infra">Cloud Infra</div>
+      <div class="filter-chip" data-filter="ads">Digital Ads</div>
+    </div>
+    <div class="txn-table-wrap">
+      <table class="txn-table" id="txnTable">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Narration</th>
+            <th>Category</th>
+            <th>AI Confidence</th>
+            <th style="text-align:right">Amount</th>
+            <th style="text-align:right">Balance</th>
+          </tr>
+        </thead>
+        <tbody id="txnBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- P&L REPORT -->
+  <!-- ══════════════════════════════════════ -->
+  <div class="main" id="page-pl">
+    <div class="page-header">
+      <div class="page-title">P&amp;L Report</div>
+      <div class="page-actions">
+        <div class="btn btn-outline">Share Link</div>
+        <div class="btn btn-outline">Export PDF</div>
+        <div class="btn btn-primary">Export Excel</div>
+      </div>
+    </div>
+    <div class="pl-content">
+      <div class="pl-tabs">
+        <div class="pl-tab active">Q1 2026</div>
+        <div class="pl-tab">Q4 2025</div>
+        <div class="pl-tab">Q3 2025</div>
+        <div class="pl-tab">Full Year 2025</div>
+      </div>
+
+      <div class="widget" style="margin-bottom:1.2rem">
+        <table class="pl-table">
+          <thead>
+            <tr>
+              <th style="width:38%">Line Item</th>
+              <th>Jan 2026</th>
+              <th>Feb 2026</th>
+              <th>Mar 2026</th>
+              <th>Q1 Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="section-row"><td colspan="5">Revenue</td></tr>
+            <tr>
+              <td>Product / Service Revenue</td>
+              <td>3,800,000</td><td>4,100,000</td><td>4,620,000</td>
+              <td class="val-pos">12,520,000</td>
+            </tr>
+            <tr>
+              <td>Other Income</td>
+              <td>120,000</td><td>80,000</td><td>200,000</td>
+              <td class="val-pos">400,000</td>
+            </tr>
+            <tr class="subtotal-row">
+              <td>Total Revenue</td>
+              <td>3,920,000</td><td>4,180,000</td><td>4,820,000</td>
+              <td class="val-pos">12,920,000</td>
+            </tr>
+
+            <tr class="section-row"><td colspan="5">Operating Expenses</td></tr>
+            <tr>
+              <td>Payroll &amp; Salaries</td>
+              <td class="val-neg">(1,100,000)</td><td class="val-neg">(1,150,000)</td><td class="val-neg">(1,200,000)</td>
+              <td class="val-neg">(3,450,000)</td>
+            </tr>
+            <tr>
+              <td>Cloud Infrastructure</td>
+              <td class="val-neg">(110,000)</td><td class="val-neg">(118,000)</td><td class="val-neg">(124,000)</td>
+              <td class="val-neg">(352,000)</td>
+            </tr>
+            <tr>
+              <td>SaaS Tools</td>
+              <td class="val-neg">(290,000)</td><td class="val-neg">(310,000)</td><td class="val-neg">(748,000)</td>
+              <td class="val-neg">(1,348,000)</td>
+            </tr>
+            <tr>
+              <td>Digital Advertising</td>
+              <td class="val-neg">(280,000)</td><td class="val-neg">(295,000)</td><td class="val-neg">(310,000)</td>
+              <td class="val-neg">(885,000)</td>
+            </tr>
+            <tr>
+              <td>Utilities &amp; Facilities</td>
+              <td class="val-neg">(85,000)</td><td class="val-neg">(90,000)</td><td class="val-neg">(88,000)</td>
+              <td class="val-neg">(263,000)</td>
+            </tr>
+            <tr>
+              <td>Miscellaneous</td>
+              <td class="val-neg">(55,000)</td><td class="val-neg">(62,000)</td><td class="val-neg">(640,000)</td>
+              <td class="val-neg">(757,000)</td>
+            </tr>
+            <tr class="subtotal-row">
+              <td>Total Expenses</td>
+              <td class="val-neg">(1,920,000)</td><td class="val-neg">(2,025,000)</td><td class="val-neg">(3,110,000)</td>
+              <td class="val-neg">(7,055,000)</td>
+            </tr>
+
+            <tr class="total-row">
+              <td>Net Profit</td>
+              <td class="val-pos">2,000,000</td><td class="val-pos">2,155,000</td><td class="val-pos">1,710,000</td>
+              <td class="val-pos">5,865,000</td>
+            </tr>
+            <tr class="total-row">
+              <td>Net Margin</td>
+              <td class="val-pos">51.0%</td><td class="val-pos">51.6%</td><td class="val-pos">35.5%</td>
+              <td class="val-pos">45.4%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p style="font-family:var(--mono);font-size:0.65rem;color:rgba(255,255,255,0.2)">
+        ★ Auto-generated by LEDGR. All figures sourced directly from connected bank accounts via AI-categorised transactions.
+      </p>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- CASH FLOW -->
+  <!-- ══════════════════════════════════════ -->
+  <div class="main" id="page-cashflow">
+    <div class="page-header">
+      <div class="page-title">Cash Flow</div>
+      <div class="page-actions">
+        <div class="btn btn-outline">90-Day Forecast</div>
+        <div class="btn btn-primary">Export PDF</div>
+      </div>
+    </div>
+    <div class="cf-content">
+      <div class="cf-summary-row">
+        <div class="cf-card">
+          <div class="cf-label">Operating Cash Flow</div>
+          <div class="cf-val pos">+₦5.86M</div>
+          <div class="cf-sub">Q1 2026 net</div>
+        </div>
+        <div class="cf-card">
+          <div class="cf-label">Current Cash Position</div>
+          <div class="cf-val pos">₦12.4M</div>
+          <div class="cf-sub">Across 2 accounts</div>
+        </div>
+        <div class="cf-card">
+          <div class="cf-label">Avg Monthly Burn</div>
+          <div class="cf-val neg">₦3.11M</div>
+          <div class="cf-sub">₦104K/day average</div>
+        </div>
+      </div>
+
+      <div class="cf-chart-wrap">
+        <div class="widget-title">12-Month Cash Position + 3-Month Forecast</div>
+        <div class="cf-bars" id="cfBars"></div>
+        <div style="display:flex;gap:4px;font-family:var(--mono);font-size:0.55rem;color:rgba(255,255,255,0.2)" id="cfLabels"></div>
+        <div class="chart-legend" style="margin-top:0.8rem">
+          <div class="legend-item"><div class="legend-dot" style="background:#22C47A"></div>Actual</div>
+          <div class="legend-item"><div class="legend-dot" style="background:rgba(34,196,122,0.3);border:1px dashed rgba(34,196,122,0.5)"></div>Forecast</div>
+        </div>
+      </div>
+
+      <div class="runway-card">
+        <div>
+          <div class="runway-num">4.0</div>
+          <div class="runway-label">Months Runway</div>
+        </div>
+        <div class="runway-desc">
+          At current burn rate of <strong style="color:white">₦3.11M/month</strong>, your cash position of ₦12.4M gives approximately 4 months of runway.
+          Revenue trend is positive (+12.4% MTD) — at current growth, you reach profitability without additional capital.
+          <br><br>
+          <span style="color:var(--accent-bright);font-family:var(--mono);font-size:0.72rem">💡 Ask the AI Accountant for a 90-day cash projection →</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- AI CHAT -->
+  <!-- ══════════════════════════════════════ -->
+  <div class="main" id="page-chat" style="overflow:hidden">
+    <div class="chat-layout">
+      <div class="chat-header">
+        <div class="chat-title">AI Accountant</div>
+        <div class="chat-sub">Ask anything about your finances. Powered by LEDGR Intelligence.</div>
+      </div>
+
+      <div class="chat-messages" id="chatMessages">
+        <!-- AI welcome -->
+        <div class="msg">
+          <div class="msg-avatar ai">L</div>
+          <div>
+            <div class="msg-label">LEDGR AI · just now</div>
+            <div class="msg-bubble">
+              Good morning, Oluwaseun. Here's your financial snapshot for <strong>March 2026</strong>:<br><br>
+              Revenue MTD: <span class="inline-num">₦4.82M</span> (↑12.4% vs Feb) · Expenses: <span class="inline-num">₦3.11M</span> · Net profit: <span class="inline-num">₦1.71M</span>
+              <div class="ai-insight">Your SaaS Tools spend spiked 142% this month. SLACK_MONTHLY_SVC charged ₦92K vs usual ₦38K. I've flagged this for your review.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- User msg -->
+        <div class="msg user">
+          <div class="msg-avatar user-av">OA</div>
+          <div>
+            <div class="msg-label" style="text-align:right">You · 9:32 AM</div>
+            <div class="msg-bubble">What's my estimated VAT liability this quarter?</div>
+          </div>
+        </div>
+
+        <!-- AI response -->
+        <div class="msg">
+          <div class="msg-avatar ai">L</div>
+          <div>
+            <div class="msg-label">LEDGR AI · 9:32 AM</div>
+            <div class="msg-bubble">
+              Based on your Q1 2026 revenue of <span class="inline-num">₦12.92M</span>, here's your estimated VAT position:<br><br>
+              <strong>Output VAT (7.5% on taxable revenue):</strong> <span class="inline-num">₦969,000</span><br>
+              <strong>Input VAT (claimable on expenses):</strong> <span class="inline-num">~₦233,000</span><br>
+              <strong>Net VAT Payable:</strong> <span class="inline-num">₦736,000</span>
+              <div class="ai-insight">Note: This is an estimate. I've excluded inter-account transfers and zero-rated items. I can generate a full Tax Readiness Report for your accountant — just ask.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="quick-prompts">
+        <div class="quick-prompt" onclick="sendQuickPrompt(this)">What's my burn rate trend?</div>
+        <div class="quick-prompt" onclick="sendQuickPrompt(this)">Show top 5 expense categories</div>
+        <div class="quick-prompt" onclick="sendQuickPrompt(this)">Generate investor-ready P&L</div>
+        <div class="quick-prompt" onclick="sendQuickPrompt(this)">90-day cash forecast</div>
+        <div class="quick-prompt" onclick="sendQuickPrompt(this)">Explain March SaaS spike</div>
+      </div>
+
+      <div class="chat-input-bar">
+        <textarea class="chat-input" id="chatInput" placeholder="Ask about your finances…" rows="1"></textarea>
+        <button class="send-btn" onclick="sendMessage()">↑</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- BANK ACCOUNTS PAGE -->
+  <!-- ══════════════════════════════════════ -->
+  <div class="main" id="page-banks">
+    <div class="page-header">
+      <div class="page-title">Bank Accounts</div>
+      <div class="page-sub">Manage your connected accounts · Last synced 2 min ago</div>
+    </div>
+    <div class="page-content">
+
+      <!-- Total balance bar -->
+      <div class="bank-total-bar">
+        <div>
+          <div class="bank-total-label">Total Balance Across All Accounts</div>
+          <div class="bank-total-val" id="bankTotalVal">₦26,181,500</div>
+          <div class="bank-total-sub">3 active accounts</div>
+        </div>
+        <button class="add-bank-btn" onclick="openAddBankModal()">⊕ Add Account</button>
+      </div>
+
+      <!-- Account cards -->
+      <div class="bank-toolbar">
+        <div class="bank-toolbar-title">Active Accounts</div>
+      </div>
+      <div id="bankList"><!-- JS renders --></div>
+
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- SETTINGS PAGE -->
+  <!-- ══════════════════════════════════════ -->
+  <div class="main" id="page-settings">
+    <div class="page-header">
+      <div class="page-title">Settings</div>
+      <div class="page-sub">Manage your workspace, profile and preferences</div>
+    </div>
+    <div class="page-content">
+
+      <!-- Tabs -->
+      <div class="settings-tabs">
+        <div class="s-tab active" data-stab="profile">Profile</div>
+        <div class="s-tab" data-stab="organisation">Organisation</div>
+        <div class="s-tab" data-stab="notifications">Notifications</div>
+        <div class="s-tab" data-stab="security">Security</div>
+        <div class="s-tab" data-stab="billing">Billing</div>
+      </div>
+
+      <!-- Profile Panel -->
+      <div class="settings-panel active" id="stab-profile">
+        <div class="s-section">
+          <div class="s-section-title">Personal Information</div>
+          <div class="s-row">
+            <div class="s-field">
+              <label>First Name</label>
+              <input class="s-input" id="s-firstName" value="Olumide" />
+            </div>
+            <div class="s-field">
+              <label>Last Name</label>
+              <input class="s-input" id="s-lastName" value="Adewale" />
+            </div>
+          </div>
+          <div class="s-row">
+            <div class="s-field">
+              <label>Email Address</label>
+              <input class="s-input" id="s-email" value="owner@techpulse.ng" type="email" />
+            </div>
+            <div class="s-field">
+              <label>Phone Number</label>
+              <input class="s-input" placeholder="+234 800 000 0000" />
+            </div>
+          </div>
+          <div class="s-row">
+            <div class="s-field">
+              <label>Role</label>
+              <input class="s-input" value="Owner" readonly style="opacity:0.5;cursor:not-allowed;" />
+            </div>
+            <div class="s-field">
+              <label>Timezone</label>
+              <select class="s-select">
+                <option selected>Africa/Lagos (WAT, UTC+1)</option>
+                <option>Africa/Abidjan (GMT, UTC+0)</option>
+                <option>Europe/London (BST, UTC+1)</option>
+                <option>America/New_York (EST, UTC-5)</option>
+              </select>
+            </div>
+          </div>
+          <div class="s-btn-row">
+            <button class="s-btn" onclick="showToast('Profile updated successfully')">Save Changes</button>
+            <button class="s-btn ghost">Cancel</button>
+          </div>
+        </div>
+
+        <div class="s-section">
+          <div class="s-section-title">Avatar</div>
+          <div style="display:flex;align-items:center;gap:1.5rem;">
+            <div style="width:64px;height:64px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-bright));display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:1.3rem;color:white;font-weight:600;">OA</div>
+            <div>
+              <button class="s-btn ghost" style="margin-bottom:0.5rem;">Upload Photo</button>
+              <div style="font-family:var(--mono);font-size:0.6rem;color:rgba(255,255,255,0.25);">PNG, JPG up to 2MB</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Organisation Panel -->
+      <div class="settings-panel" id="stab-organisation">
+        <div class="s-section">
+          <div class="s-section-title">Company Details</div>
+          <div class="s-row">
+            <div class="s-field">
+              <label>Company Name</label>
+              <input class="s-input" value="TechPulse Nigeria Ltd" />
+            </div>
+            <div class="s-field">
+              <label>Business Type</label>
+              <select class="s-select">
+                <option selected>Limited Liability Company</option>
+                <option>Sole Proprietorship</option>
+                <option>Partnership</option>
+                <option>NGO / Non-profit</option>
+              </select>
+            </div>
+          </div>
+          <div class="s-row">
+            <div class="s-field">
+              <label>RC Number (CAC)</label>
+              <input class="s-input" placeholder="RC-1234567" />
+            </div>
+            <div class="s-field">
+              <label>TIN (FIRS)</label>
+              <input class="s-input" placeholder="00000000-0001" />
+            </div>
+          </div>
+          <div class="s-row">
+            <div class="s-field">
+              <label>Default Currency</label>
+              <select class="s-select">
+                <option selected>NGN — Nigerian Naira (₦)</option>
+                <option>USD — US Dollar ($)</option>
+                <option>GBP — British Pound (£)</option>
+                <option>EUR — Euro (€)</option>
+              </select>
+            </div>
+            <div class="s-field">
+              <label>Financial Year Start</label>
+              <select class="s-select">
+                <option selected>January</option>
+                <option>April</option>
+                <option>July</option>
+                <option>October</option>
+              </select>
+            </div>
+          </div>
+          <div class="s-row full">
+            <div class="s-field">
+              <label>Business Address</label>
+              <input class="s-input" placeholder="14 Admiralty Way, Lekki Phase 1, Lagos" />
+            </div>
+          </div>
+          <div class="s-btn-row">
+            <button class="s-btn" onclick="showToast('Organisation details saved')">Save Changes</button>
+          </div>
+        </div>
+
+        <!-- Team Members -->
+        <div class="s-section">
+          <div class="s-section-title">Team Members</div>
+          <div id="teamList"><!-- JS renders --></div>
+          <div class="s-btn-row" style="margin-top:1rem;">
+            <button class="s-btn ghost" onclick="showToast('Invite sent! (demo mode)')">⊕ Invite Team Member</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notifications Panel -->
+      <div class="settings-panel" id="stab-notifications">
+        <div class="s-section">
+          <div class="s-section-title">Email Notifications</div>
+          <div class="s-toggle-row">
+            <div class="s-toggle-info">
+              <div class="s-toggle-label">Daily financial summary</div>
+              <div class="s-toggle-desc">Receive a morning digest of yesterday's transactions</div>
+            </div>
+            <label class="toggle"><input type="checkbox" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+          </div>
+          <div class="s-toggle-row">
+            <div class="s-toggle-info">
+              <div class="s-toggle-label">Anomaly alerts</div>
+              <div class="s-toggle-desc">Notify when AI detects unusual spending patterns</div>
+            </div>
+            <label class="toggle"><input type="checkbox" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+          </div>
+          <div class="s-toggle-row">
+            <div class="s-toggle-info">
+              <div class="s-toggle-label">Invoice reminders</div>
+              <div class="s-toggle-desc">7-day and 1-day reminders for upcoming invoice due dates</div>
+            </div>
+            <label class="toggle"><input type="checkbox" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+          </div>
+          <div class="s-toggle-row">
+            <div class="s-toggle-info">
+              <div class="s-toggle-label">Budget threshold alerts</div>
+              <div class="s-toggle-desc">Alert when spending reaches 80% and 100% of any budget</div>
+            </div>
+            <label class="toggle"><input type="checkbox" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+          </div>
+          <div class="s-toggle-row">
+            <div class="s-toggle-info">
+              <div class="s-toggle-label">Monthly P&amp;L report</div>
+              <div class="s-toggle-desc">Auto-generate and email P&amp;L on the 1st of each month</div>
+            </div>
+            <label class="toggle"><input type="checkbox"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+          </div>
+        </div>
+
+        <div class="s-section">
+          <div class="s-section-title">In-App Notifications</div>
+          <div class="s-toggle-row">
+            <div class="s-toggle-info">
+              <div class="s-toggle-label">Large transaction alerts</div>
+              <div class="s-toggle-desc">Flag transactions over ₦1,000,000</div>
+            </div>
+            <label class="toggle"><input type="checkbox" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+          </div>
+          <div class="s-toggle-row">
+            <div class="s-toggle-info">
+              <div class="s-toggle-label">Low balance warning</div>
+              <div class="s-toggle-desc">Alert when any account falls below ₦500,000</div>
+            </div>
+            <label class="toggle"><input type="checkbox" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+          </div>
+          <div class="s-toggle-row">
+            <div class="s-toggle-info">
+              <div class="s-toggle-label">Bank sync failures</div>
+              <div class="s-toggle-desc">Notify if automatic bank sync fails</div>
+            </div>
+            <label class="toggle"><input type="checkbox" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+          </div>
+        </div>
+        <div class="s-btn-row">
+          <button class="s-btn" onclick="showToast('Notification preferences saved')">Save Preferences</button>
+        </div>
+      </div>
+
+      <!-- Security Panel -->
+      <div class="settings-panel" id="stab-security">
+        <div class="s-section">
+          <div class="s-section-title">Change Password</div>
+          <div class="s-row full"><div class="s-field"><label>Current Password</label><input class="s-input" type="password" placeholder="••••••••" /></div></div>
+          <div class="s-row">
+            <div class="s-field"><label>New Password</label><input class="s-input" type="password" placeholder="Min 8 characters" /></div>
+            <div class="s-field"><label>Confirm Password</label><input class="s-input" type="password" placeholder="Repeat new password" /></div>
+          </div>
+          <div class="s-btn-row">
+            <button class="s-btn" onclick="showToast('Password changed successfully')">Update Password</button>
+          </div>
+        </div>
+        <div class="s-section">
+          <div class="s-section-title">Two-Factor Authentication</div>
+          <div class="s-toggle-row">
+            <div class="s-toggle-info">
+              <div class="s-toggle-label">Enable 2FA via Authenticator App</div>
+              <div class="s-toggle-desc">Use Google Authenticator or Authy for extra security</div>
+            </div>
+            <label class="toggle"><input type="checkbox"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+          </div>
+          <div class="s-toggle-row">
+            <div class="s-toggle-info">
+              <div class="s-toggle-label">SMS verification on login</div>
+              <div class="s-toggle-desc">Send OTP to your registered phone number</div>
+            </div>
+            <label class="toggle"><input type="checkbox" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+          </div>
+        </div>
+        <div class="s-section">
+          <div class="s-section-title">Active Sessions</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:0.8rem 0;border-bottom:1px solid rgba(255,255,255,0.04);">
+            <div>
+              <div style="font-size:0.85rem;color:white;">Chrome on macOS · Lagos, Nigeria</div>
+              <div style="font-family:var(--mono);font-size:0.6rem;color:var(--accent-bright);">● Current session</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:0.8rem 0;">
+            <div>
+              <div style="font-size:0.85rem;color:rgba(255,255,255,0.6);">Safari on iPhone · Lagos, Nigeria</div>
+              <div style="font-family:var(--mono);font-size:0.6rem;color:rgba(255,255,255,0.25);">Last active 3 hours ago</div>
+            </div>
+            <button class="s-btn ghost" style="font-size:0.75rem;padding:0.35rem 0.8rem;" onclick="showToast('Session revoked')">Revoke</button>
+          </div>
+          <div class="s-btn-row">
+            <button class="s-btn danger" onclick="showToast('All other sessions revoked')">Revoke All Other Sessions</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Billing Panel -->
+      <div class="settings-panel" id="stab-billing">
+        <div class="s-section">
+          <div class="s-section-title">Current Plan</div>
+          <div style="display:flex;align-items:center;gap:1.5rem;margin-bottom:1.2rem;">
+            <div style="flex:1;">
+              <div style="display:flex;align-items:center;gap:0.7rem;margin-bottom:0.4rem;">
+                <div style="font-size:1.1rem;font-weight:700;color:white;">Growth Plan</div>
+                <div style="font-family:var(--mono);font-size:0.6rem;color:var(--accent-bright);background:rgba(34,196,122,0.1);border:1px solid rgba(34,196,122,0.2);border-radius:3px;padding:0.15rem 0.5rem;">ACTIVE</div>
+              </div>
+              <div style="font-family:var(--mono);font-size:0.65rem;color:rgba(255,255,255,0.35);">₦15,000/month · Renews 1 Apr 2026</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-family:var(--display);font-size:1.8rem;color:var(--accent-bright);">₦15K</div>
+              <div style="font-family:var(--mono);font-size:0.6rem;color:rgba(255,255,255,0.25);">per month</div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.7rem;margin-bottom:1.2rem;">
+            <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:7px;padding:0.8rem;text-align:center;">
+              <div style="font-family:var(--display);font-size:1.3rem;color:white;">3</div>
+              <div style="font-family:var(--mono);font-size:0.58rem;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.1em;">Bank Accounts</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:7px;padding:0.8rem;text-align:center;">
+              <div style="font-family:var(--display);font-size:1.3rem;color:white;">∞</div>
+              <div style="font-family:var(--mono);font-size:0.58rem;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.1em;">Transactions</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:7px;padding:0.8rem;text-align:center;">
+              <div style="font-family:var(--display);font-size:1.3rem;color:white;">✦</div>
+              <div style="font-family:var(--mono);font-size:0.58rem;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.1em;">AI Chat</div>
+            </div>
+          </div>
+          <div class="s-btn-row">
+            <button class="s-btn" onclick="showToast('Redirecting to upgrade page… (demo)')">Upgrade to Scale</button>
+            <button class="s-btn ghost" onclick="showToast('Billing portal opened (demo)')">Manage Billing</button>
+          </div>
+        </div>
+
+        <div class="s-section">
+          <div class="s-section-title">Payment Method</div>
+          <div style="display:flex;align-items:center;gap:1rem;padding:0.9rem;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;margin-bottom:1rem;">
+            <div style="width:40px;height:26px;background:#1a3c8f;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:0.55rem;color:white;font-weight:700;letter-spacing:0.05em;">VISA</div>
+            <div style="flex:1;">
+              <div style="font-size:0.85rem;color:white;">Visa ending in 4821</div>
+              <div style="font-family:var(--mono);font-size:0.6rem;color:rgba(255,255,255,0.3);">Expires 09/2027</div>
+            </div>
+            <div style="font-family:var(--mono);font-size:0.6rem;color:var(--accent-bright);">Default</div>
+          </div>
+          <button class="s-btn ghost" onclick="showToast('Card update form opened (demo)')">⊕ Add Payment Method</button>
+        </div>
+
+        <div class="s-section">
+          <div class="s-section-title">Billing History</div>
+          <div id="billingHistory"><!-- JS renders --></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- end app-body -->
+
+
+<!-- ADD BANK MODAL -->
+<div class="modal-overlay" id="addBankModal">
+  <div class="modal-box">
+    <div class="modal-title">Add Bank Account</div>
+    <div class="modal-sub">Connect a new bank account to your workspace</div>
+    <div class="s-row">
+      <div class="s-field">
+        <label>Account Nickname</label>
+        <input class="s-input" id="nb-name" placeholder="e.g. GTBank Operations" />
+      </div>
+      <div class="s-field">
+        <label>Bank Name</label>
+        <select class="s-select" id="nb-bank">
+          <option value="">Select bank…</option>
+          <option>Access Bank</option>
+          <option>First Bank</option>
+          <option>GTBank</option>
+          <option>Zenith Bank</option>
+          <option>UBA</option>
+          <option>Stanbic IBTC</option>
+          <option>Fidelity Bank</option>
+          <option>Union Bank</option>
+          <option>Ecobank</option>
+          <option>Polaris Bank</option>
+          <option>Wema Bank</option>
+          <option>Opay</option>
+          <option>Kuda Bank</option>
+          <option>Moniepoint</option>
+        </select>
+      </div>
+    </div>
+    <div class="s-row">
+      <div class="s-field">
+        <label>Account Number</label>
+        <input class="s-input" id="nb-number" placeholder="0123456789" maxlength="10" />
+      </div>
+      <div class="s-field">
+        <label>Account Type</label>
+        <select class="s-select" id="nb-type">
+          <option value="CURRENT">Current Account</option>
+          <option value="SAVINGS">Savings Account</option>
+          <option value="DOMICILIARY">Domiciliary Account</option>
+          <option value="WALLET">Mobile Wallet</option>
+        </select>
+      </div>
+    </div>
+    <div class="s-row full">
+      <div class="s-field">
+        <label>Opening Balance (₦)</label>
+        <input class="s-input" id="nb-balance" placeholder="0.00" type="number" min="0" />
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="s-btn ghost" onclick="closeAddBankModal()">Cancel</button>
+      <button class="s-btn" onclick="addBankAccount()">Add Account</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+</div><!-- /appShell -->
+
+<script>
+// ══════════════════════════════════════════════════
+//  LEDGR — Complete standalone app
+// ══════════════════════════════════════════════════
+
+// ── CREDENTIALS ───────────────────────────────────
+var EMAIL    = "owner@techpulse.ng";
+var PASSWORD = "password123";
+var NAME     = "Olumide";
+var INITIALS = "OA";
+
+// ── LOGIN ─────────────────────────────────────────
+function doLogin() {
+  var email = document.getElementById("loginEmail").value.trim();
+  var pass  = document.getElementById("loginPassword").value;
+  var btn   = document.getElementById("loginBtn");
+  var err   = document.getElementById("loginError");
+
+  err.style.display = "none";
+
+  if (!email || !pass) {
+    err.textContent = "Please enter your email and password.";
+    err.style.display = "block";
+    return;
+  }
+
+  btn.textContent = "Signing in...";
+  btn.disabled = true;
+
+  setTimeout(function () {
+    if (email === EMAIL && pass === PASSWORD) {
+      document.getElementById("loginScreen").style.display = "none";
+      document.getElementById("appShell").style.display = "flex";
+      bootApp();
+    } else {
+      err.textContent = "Incorrect credentials. Use: owner@techpulse.ng / password123";
+      err.style.display = "block";
+      btn.textContent = "Sign In";
+      btn.disabled = false;
+    }
+  }, 500);
+}
+
+document.getElementById("loginBtn").addEventListener("click", doLogin);
+
+document.getElementById("loginPassword").addEventListener("keydown", function (e) {
+  if (e.key === "Enter") doLogin();
+});
+
+document.getElementById("loginEmail").addEventListener("keydown", function (e) {
+  if (e.key === "Enter") document.getElementById("loginPassword").focus();
+});
+
+// ── BOOT ──────────────────────────────────────────
+function bootApp() {
+  var h = new Date().getHours();
+  var tod = h < 12 ? "morning" : h < 17 ? "afternoon" : "evening";
+  var greet = document.querySelector(".dash-greeting");
+  if (greet) greet.textContent = "Good " + tod + ", " + NAME + ".";
+  var av = document.querySelector(".avatar");
+  if (av) av.textContent = INITIALS;
+
+  initNav();
+  buildRevChart();
+  buildCFChart();
+  renderTxns(TXN_DATA);
+  setupSearch();
+  setupPLTabs();
+  setupSettingsTabs();
+  renderBanks();
+  renderTeam();
+  renderBilling();
+}
+
+// ── NAVIGATION ────────────────────────────────────
+function initNav() {
+  var items = document.querySelectorAll(".nav-item[data-page]");
+  var pages = document.querySelectorAll(".main");
+  items.forEach(function (item) {
+    item.addEventListener("click", function () {
+      items.forEach(function (n) { n.classList.remove("active"); });
+      item.classList.add("active");
+      pages.forEach(function (p) {
+        p.classList.remove("active");
+        if (p.id === "page-" + item.dataset.page) p.classList.add("active");
+      });
+    });
+  });
+}
+
+// ── REVENUE CHART ─────────────────────────────────
+function buildRevChart() {
+  var months  = ["Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec","Jan","Feb","Mar"];
+  var rev     = [3.2,3.5,3.1,3.8,4.0,3.6,4.2,3.9,4.4,3.92,4.18,4.82];
+  var exp     = [2.1,2.3,2.0,2.5,2.4,2.6,2.7,2.5,2.8,1.92,2.03,3.11];
+  var maxV    = Math.max.apply(null, rev.concat(exp));
+  var chart   = document.getElementById("revChart");
+  var lbls    = document.getElementById("chartLabels");
+  if (!chart || !lbls) return;
+  months.forEach(function (m, i) {
+    var p = document.createElement("div");
+    p.className = "bar-pair";
+    p.innerHTML =
+      "<div class=\"bar bar-rev\" style=\"height:" + (rev[i]/maxV*90).toFixed(1) + "px\" title=\"Rev \u20a6" + rev[i] + "M\"></div>" +
+      "<div class=\"bar bar-exp\" style=\"height:" + (exp[i]/maxV*90).toFixed(1) + "px\" title=\"Exp \u20a6" + exp[i] + "M\"></div>";
+    chart.appendChild(p);
+    var l = document.createElement("span");
+    l.textContent = m;
+    lbls.appendChild(l);
+  });
+}
+
+// ── CASH FLOW CHART ───────────────────────────────
+function buildCFChart() {
+  var mos  = ["Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec","Jan","Feb","Mar","Apr*","May*","Jun*"];
+  var vals = [8.1,8.9,7.6,9.2,10.1,9.4,11.2,10.8,12.0,10.4,11.1,12.4,13.1,13.8,14.5];
+  var maxV = Math.max.apply(null, vals);
+  var wrap = document.getElementById("cfBars");
+  if (!wrap) return;
+  mos.forEach(function (m, i) {
+    var w = document.createElement("div");
+    w.className = "cf-bar-wrap";
+    var b = document.createElement("div");
+    b.className = "cf-bar";
+    b.style.height     = (vals[i]/maxV*120).toFixed(1) + "px";
+    b.style.background = i > 11 ? "rgba(34,196,122,0.25)" : "var(--accent-bright)";
+    b.style.border     = i > 11 ? "1px dashed rgba(34,196,122,0.5)" : "none";
+    b.title = m + ": \u20a6" + vals[i] + "M";
+    var l = document.createElement("div");
+    l.className = "cf-bar-label";
+    l.textContent = m;
+    w.appendChild(b);
+    w.appendChild(l);
+    wrap.appendChild(w);
+  });
+}
+
+// ── TRANSACTIONS ──────────────────────────────────
+var TXN_DATA = [
+  {date:"18 Mar",narration:"PSTK/MONNIFY_SETTLE",    cat:"Revenue",      cc:"cat-rev",  conf:97, amt:"+\u20a6890,000",    bal:"\u20a612,400,000", pos:true},
+  {date:"18 Mar",narration:"GOOGADS_CONVERT_MKT9",   cat:"Digital Ads",  cc:"cat-ads",  conf:94, amt:"\u2212\u20a6155,000",bal:"\u20a611,510,000", pos:false},
+  {date:"17 Mar",narration:"NEPA/IKEDC_COMMERCIAL",  cat:"Utilities",    cc:"cat-util", conf:99, amt:"\u2212\u20a628,000", bal:"\u20a611,665,000", pos:false},
+  {date:"16 Mar",narration:"SLACK_MONTHLY_SVC",      cat:"SaaS Tools",   cc:"cat-saas", conf:88, amt:"\u2212\u20a692,000", bal:"\u20a611,693,000", pos:false},
+  {date:"15 Mar",narration:"ZOHOPAYROLL_MAR_BATCH",  cat:"Payroll",      cc:"cat-pay",  conf:99, amt:"\u2212\u20a61,200,000",bal:"\u20a611,785,000",pos:false},
+  {date:"14 Mar",narration:"AWS_RECUR_7294_COMPUTE", cat:"Cloud Infra",  cc:"cat-cloud",conf:99, amt:"\u2212\u20a6124,000",bal:"\u20a612,985,000", pos:false},
+  {date:"13 Mar",narration:"FLUTTERWAVE_SETTLE_B2",  cat:"Revenue",      cc:"cat-rev",  conf:95, amt:"+\u20a6620,000",    bal:"\u20a613,109,000", pos:true},
+  {date:"12 Mar",narration:"ZOOM_VIDEO_COMM_SUB",    cat:"SaaS Tools",   cc:"cat-saas", conf:91, amt:"\u2212\u20a618,500", bal:"\u20a612,489,000", pos:false},
+  {date:"11 Mar",narration:"GTB_INTXFR_0234_OPS",   cat:"Inter-Account",cc:"cat-util", conf:72, amt:"\u2212\u20a6500,000",bal:"\u20a612,507,500", pos:false},
+  {date:"10 Mar",narration:"SENDGRID_EMAIL_API_MAR", cat:"SaaS Tools",   cc:"cat-saas", conf:89, amt:"\u2212\u20a624,000", bal:"\u20a613,007,500", pos:false},
+  {date:"9 Mar", narration:"PAYSTACK_SETTLEMENT_6",  cat:"Revenue",      cc:"cat-rev",  conf:98, amt:"+\u20a61,250,000",  bal:"\u20a613,031,500", pos:true},
+  {date:"8 Mar", narration:"MICROSOFT365_ORG_MAR",   cat:"SaaS Tools",   cc:"cat-saas", conf:96, amt:"\u2212\u20a645,000", bal:"\u20a611,781,500", pos:false}
+];
+
+function renderTxns(data) {
+  var tb = document.getElementById("txnBody");
+  if (!tb) return;
+  tb.innerHTML = "";
+  data.forEach(function (t) {
+    var tr = document.createElement("tr");
+    var lc = t.conf < 85;
+    tr.innerHTML =
+      "<td class=\"td-date\">" + t.date + "</td>" +
+      "<td class=\"td-narr\">" + t.narration + "</td>" +
+      "<td><span class=\"txn-cat " + t.cc + "\">" + t.cat + "</span></td>" +
+      "<td><div class=\"confidence-bar-wrap" + (lc ? " low-confidence" : "") + "\">" +
+        "<div class=\"confidence-bar\"><div class=\"confidence-fill\" style=\"width:" + t.conf + "%\"></div></div>" +
+        "<span class=\"confidence-num\">" + t.conf + "%</span></div></td>" +
+      "<td class=\"td-amount " + (t.pos ? "pos-val" : "neg-val") + "\" style=\"text-align:right\">" + t.amt + "</td>" +
+      "<td class=\"td-amount\" style=\"text-align:right;color:rgba(255,255,255,0.4)\">" + t.bal + "</td>";
+    tb.appendChild(tr);
+  });
+}
+
+function setupSearch() {
+  document.querySelectorAll(".filter-chip").forEach(function (chip) {
+    chip.addEventListener("click", function () {
+      document.querySelectorAll(".filter-chip").forEach(function (c) { c.classList.remove("active"); });
+      chip.classList.add("active");
+      var f = chip.dataset.filter;
+      if (f === "all") { renderTxns(TXN_DATA); return; }
+      var filtered = TXN_DATA.filter(function (t) {
+        return t.cat.toLowerCase().indexOf(f) !== -1 || t.cc.indexOf(f) !== -1;
+      });
+      renderTxns(filtered.length ? filtered : TXN_DATA);
+    });
+  });
+  var s = document.getElementById("txnSearch");
+  if (s) {
+    s.addEventListener("input", function () {
+      var q = this.value.toLowerCase();
+      if (!q) { renderTxns(TXN_DATA); return; }
+      renderTxns(TXN_DATA.filter(function (t) {
+        return t.narration.toLowerCase().indexOf(q) !== -1 || t.cat.toLowerCase().indexOf(q) !== -1;
+      }));
+    });
+  }
+}
+
+function setupPLTabs() {
+  document.querySelectorAll(".pl-tab").forEach(function (tab) {
+    tab.addEventListener("click", function () {
+      document.querySelectorAll(".pl-tab").forEach(function (t) { t.classList.remove("active"); });
+      tab.classList.add("active");
+    });
+  });
+}
+
+// ── SETTINGS TABS ─────────────────────────────────
+function setupSettingsTabs() {
+  document.querySelectorAll(".s-tab").forEach(function (tab) {
+    tab.addEventListener("click", function () {
+      document.querySelectorAll(".s-tab").forEach(function (t) { t.classList.remove("active"); });
+      document.querySelectorAll(".settings-panel").forEach(function (p) { p.classList.remove("active"); });
+      tab.classList.add("active");
+      var panel = document.getElementById("stab-" + tab.dataset.stab);
+      if (panel) panel.classList.add("active");
+    });
+  });
+}
+
+// ── AI CHAT ───────────────────────────────────────
+var AI_RESPONSES = {
+  burn:     "Your burn rate has been trending upward.\nJan: \u20a662K/day \u2192 Feb: \u20a672K/day \u2192 Mar: \u20a6104K/day.\nThe March spike is driven by the anomalous SLACK charge (\u20a692K) and higher payroll. Underlying burn is closer to \u20a685K/day.",
+  expense:  "Top 5 expense categories MTD:\n1. Payroll \u2014 \u20a61.20M (38.6%)\n2. SaaS Tools \u2014 \u20a6748K (24.1%) \u26a0 spike\n3. Digital Ads \u2014 \u20a6310K (10.0%)\n4. Cloud Infra \u2014 \u20a6124K (4.0%)\n5. Utilities \u2014 \u20a688K (2.8%)",
+  investor: "I can generate your Investor-Ready Package: 12-month P&L, Balance Sheet, Cash Flow, and key metrics. Connect the backend to download PDFs.",
+  forecast: "Based on your +12.4% MoM revenue trend:\n\nApr 2026: Rev \u20a65.4M \u00b7 Exp \u20a63.2M \u00b7 Net \u20a62.2M\nMay 2026: Rev \u20a66.1M \u00b7 Exp \u20a63.4M \u00b7 Net \u20a62.7M\nJun 2026: Rev \u20a66.8M \u00b7 Exp \u20a63.5M \u00b7 Net \u20a63.3M",
+  saas:     "SLACK_MONTHLY_SVC spike: Normal \u20a638K \u2192 charged \u20a692K (+142%). Likely a plan upgrade, annual renewal, or FX fluctuation. Check your Slack billing portal.",
+  fallback: "Q1 2026: Revenue \u20a612.92M, Expenses \u20a67.06M, Net Margin 45.4%. What would you like to explore?"
+};
+
+function getReply(msg) {
+  var m = msg.toLowerCase();
+  if (m.indexOf("burn") !== -1)                                         return AI_RESPONSES.burn;
+  if (m.indexOf("top") !== -1 || m.indexOf("expense") !== -1)          return AI_RESPONSES.expense;
+  if (m.indexOf("investor") !== -1 || m.indexOf("p&l") !== -1)         return AI_RESPONSES.investor;
+  if (m.indexOf("forecast") !== -1 || m.indexOf("90") !== -1)          return AI_RESPONSES.forecast;
+  if (m.indexOf("saas") !== -1 || m.indexOf("slack") !== -1)           return AI_RESPONSES.saas;
+  return AI_RESPONSES.fallback;
+}
+
+function sendMessage() {
+  var inp = document.getElementById("chatInput");
+  if (!inp) return;
+  var txt = inp.value.trim();
+  if (!txt) return;
+  inp.value = "";
+  addMsg("user", txt);
+  var tid = addTyping();
+  setTimeout(function () { removeTyping(tid); addMsg("ai", getReply(txt)); }, 800 + Math.random() * 500);
+}
+
+function sendQuickPrompt(el) {
+  var txt = el.textContent.trim();
+  addMsg("user", txt);
+  var tid = addTyping();
+  setTimeout(function () { removeTyping(tid); addMsg("ai", getReply(txt)); }, 800 + Math.random() * 500);
+}
+
+function addMsg(role, text) {
+  var c = document.getElementById("chatMessages");
+  if (!c) return;
+  var isAI = role === "ai";
+  var now  = new Date().toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"});
+  var d = document.createElement("div");
+  d.className = "msg" + (isAI ? "" : " user");
+  d.innerHTML =
+    "<div class=\"msg-avatar " + (isAI ? "ai" : "user-av") + "\">" + (isAI ? "L" : INITIALS) + "</div>" +
+    "<div>" +
+      "<div class=\"msg-label\"" + (isAI ? "" : " style=\"text-align:right\"") + ">" + (isAI ? "LEDGR AI" : "You") + " \u00b7 " + now + "</div>" +
+      "<div class=\"msg-bubble\">" + text.replace(/\n/g, "<br>") + "</div>" +
+    "</div>";
+  c.appendChild(d);
+  c.scrollTop = c.scrollHeight;
+}
+
+var _tc = 0;
+function addTyping() {
+  var id = "ty-" + (++_tc);
+  var c  = document.getElementById("chatMessages");
+  if (!c) return id;
+  var d = document.createElement("div");
+  d.className = "msg";
+  d.id = id;
+  d.innerHTML = "<div class=\"msg-avatar ai\">L</div><div><div class=\"msg-bubble\" style=\"padding:0.7rem 1rem\"><div class=\"typing-indicator\"><div class=\"typing-dot\"></div><div class=\"typing-dot\"></div><div class=\"typing-dot\"></div></div></div></div>";
+  c.appendChild(d);
+  c.scrollTop = c.scrollHeight;
+  return id;
+}
+
+function removeTyping(id) {
+  var el = document.getElementById(id);
+  if (el) el.remove();
+}
+
+var chatIn = document.getElementById("chatInput");
+if (chatIn) {
+  chatIn.addEventListener("keydown", function (e) {
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  });
+}
+
+// ── BANK ACCOUNTS ─────────────────────────────────
+var BANKS = [
+  {id:1, name:"GTBank Business Current", bank:"Guaranty Trust Bank", num:"0123456789", type:"Current",     bal:12400000, col:"#f47920", ini:"GT"},
+  {id:2, name:"Zenith Dollar Dom",       bank:"Zenith Bank",         num:"2087654321", type:"Domiciliary", bal:8950000,  col:"#cc0000", ini:"ZB"},
+  {id:3, name:"Kuda Operations Wallet",  bank:"Kuda Bank",           num:"9012345678", type:"Wallet",      bal:4831500,  col:"#4B1FE5", ini:"KD"}
+];
+
+function fmtBal(n) {
+  if (n >= 1000000) return "\u20a6" + (n/1000000).toFixed(2) + "M";
+  if (n >= 1000)    return "\u20a6" + (n/1000).toFixed(1) + "K";
+  return "\u20a6" + n.toLocaleString();
+}
+
+function renderBanks() {
+  var list = document.getElementById("bankList");
+  if (!list) return;
+  var total = BANKS.reduce(function (a, b) { return a + b.bal; }, 0);
+  var tv = document.getElementById("bankTotalVal");
+  var ts = document.querySelector(".bank-total-sub");
+  if (tv) tv.textContent = fmtBal(total);
+  if (ts) ts.textContent = BANKS.length + " active account" + (BANKS.length !== 1 ? "s" : "");
+  list.innerHTML = "";
+  BANKS.forEach(function (b) {
+    var card = document.createElement("div");
+    card.className = "bank-card";
+    card.innerHTML =
+      "<div class=\"bank-icon\" style=\"background:" + b.col + "\">" + b.ini + "</div>" +
+      "<div class=\"bank-info\"><div class=\"bank-name\">" + b.name + "</div>" +
+      "<div class=\"bank-meta\">" + b.bank + " \u00b7 " + b.type + " \u00b7 \u2022\u2022\u2022\u2022" + b.num.slice(-4) + "</div></div>" +
+      "<div class=\"bank-balance-col\"><div class=\"bank-balance\">" + fmtBal(b.bal) + "</div><div class=\"bank-balance-label\">Available</div></div>" +
+      "<div class=\"bank-actions\">" +
+        "<button class=\"bank-action-btn sync\" onclick=\"syncBank(" + b.id + ")\">Sync</button>" +
+        "<button class=\"bank-action-btn\" onclick=\"removeBank(" + b.id + ")\" style=\"color:#f08080\">Remove</button>" +
+      "</div>";
+    list.appendChild(card);
+  });
+}
+
+function syncBank(id) {
+  var b = BANKS.find(function (x) { return x.id === id; });
+  if (b) showToast("\u2713 " + b.bank + " synced");
+}
+
+function removeBank(id) {
+  if (!confirm("Remove this account?")) return;
+  BANKS = BANKS.filter(function (b) { return b.id !== id; });
+  renderBanks();
+  showToast("Account removed");
+}
+
+function openAddBankModal() {
+  document.getElementById("addBankModal").classList.add("open");
+}
+
+function closeAddBankModal() {
+  document.getElementById("addBankModal").classList.remove("open");
+}
+
+document.getElementById("addBankModal").addEventListener("click", function (e) {
+  if (e.target === this) closeAddBankModal();
+});
+
+function addBankAccount() {
+  var name = document.getElementById("nb-name").value.trim();
+  var bank = document.getElementById("nb-bank").value;
+  var num  = document.getElementById("nb-number").value.trim();
+  var type = document.getElementById("nb-type");
+  var bal  = parseFloat(document.getElementById("nb-balance").value) || 0;
+  if (!name || !bank || !num) { showToast("\u26a0 Fill in all required fields"); return; }
+  if (num.length !== 10)      { showToast("\u26a0 Account number must be 10 digits"); return; }
+  var cols = ["#1A6B4A","#4B1FE5","#f47920","#cc0000","#007bff","#9c27b0"];
+  BANKS.push({id: Date.now(), name: name, bank: bank, num: num,
+    type: type.options[type.selectedIndex].text, bal: bal,
+    col: cols[BANKS.length % cols.length], ini: bank.slice(0,2).toUpperCase()});
+  renderBanks();
+  closeAddBankModal();
+  ["nb-name","nb-number","nb-balance"].forEach(function (id) { document.getElementById(id).value = ""; });
+  showToast("\u2713 " + bank + " account added");
+}
+
+// ── TEAM ──────────────────────────────────────────
+function renderTeam() {
+  var el = document.getElementById("teamList");
+  if (!el) return;
+  var team = [
+    {name:"Olumide Adewale", email:"owner@techpulse.ng",  role:"Owner",      col:"#1A6B4A", ini:"OA"},
+    {name:"Amaka Okonkwo",   email:"amaka@techpulse.ng",  role:"Accountant", col:"#9c27b0", ini:"AO"},
+    {name:"Biodun Fashola",  email:"biodun@techpulse.ng", role:"Member",     col:"#007bff", ini:"BF"}
+  ];
+  el.innerHTML = team.map(function (m) {
+    return "<div style=\"display:flex;align-items:center;gap:1rem;padding:0.75rem 0;border-bottom:1px solid rgba(255,255,255,0.04)\">" +
+      "<div style=\"width:36px;height:36px;border-radius:8px;background:" + m.col + ";display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:0.7rem;color:white;flex-shrink:0\">" + m.ini + "</div>" +
+      "<div style=\"flex:1\"><div style=\"font-size:0.85rem;color:white\">" + m.name + "</div><div style=\"font-family:var(--mono);font-size:0.6rem;color:rgba(255,255,255,0.3)\">" + m.email + "</div></div>" +
+      "<div style=\"font-family:var(--mono);font-size:0.6rem;color:rgba(255,255,255,0.4);background:rgba(255,255,255,0.06);border-radius:4px;padding:0.2rem 0.6rem\">" + m.role + "</div>" +
+      (m.role !== "Owner" ? "<button class=\"bank-action-btn\" onclick=\"showToast('Manage (demo)')\">Manage</button>" : "") +
+    "</div>";
+  }).join("");
+}
+
+// ── BILLING ───────────────────────────────────────
+function renderBilling() {
+  var el = document.getElementById("billingHistory");
+  if (!el) return;
+  var rows = [
+    {date:"1 Mar 2026", amt:"\u20a615,000"},
+    {date:"1 Feb 2026", amt:"\u20a615,000"},
+    {date:"1 Jan 2026", amt:"\u20a615,000"},
+    {date:"1 Dec 2025", amt:"\u20a615,000"}
+  ];
+  el.innerHTML = rows.map(function (r) {
+    return "<div style=\"display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid rgba(255,255,255,0.04)\">" +
+      "<div><div style=\"font-size:0.85rem;color:rgba(255,255,255,0.7)\">Growth Plan \u2014 Monthly</div><div style=\"font-family:var(--mono);font-size:0.6rem;color:rgba(255,255,255,0.3)\">" + r.date + "</div></div>" +
+      "<div style=\"display:flex;align-items:center;gap:1rem\">" +
+        "<div style=\"font-family:var(--mono);font-size:0.82rem;color:white\">" + r.amt + "</div>" +
+        "<div style=\"font-family:var(--mono);font-size:0.6rem;color:var(--accent-bright);background:rgba(34,196,122,0.1);border:1px solid rgba(34,196,122,0.2);border-radius:3px;padding:0.15rem 0.5rem\">Paid</div>" +
+        "<button class=\"bank-action-btn\" onclick=\"showToast('PDF downloaded (demo)')\">PDF</button>" +
+      "</div></div>";
+  }).join("");
+}
+
+// ── TOAST ─────────────────────────────────────────
+var _tt = null;
+function showToast(msg) {
+  var t = document.getElementById("toast");
+  if (!t) return;
+  t.textContent = msg;
+  t.classList.add("show");
+  if (_tt) clearTimeout(_tt);
+  _tt = setTimeout(function () { t.classList.remove("show"); }, 2800);
+}
+</script>
+
+</body>
+</html>
